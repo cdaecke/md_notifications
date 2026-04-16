@@ -138,6 +138,22 @@ global configuration in the section `[MAIL][templateRootPaths]`. As soon, as you
 the path to your extension, you can copy the `Notifications.html` template from
 `Resources/Private/Templates/Email/` to your path and do your modifications.
 
+**Important:** This extension registers its template root path with the array index `2025`.
+TYPO3 resolves `templateRootPaths` from the highest index to the lowest, so your custom
+path must be registered with an index **higher than `2025`** to take precedence.
+
+Example in your `ext_localconf.php`:
+
+```php
+$GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths'][2100] = 'EXT:my_sitepackage/Resources/Private/Templates/Email/';
+```
+
+Place your customized template at:
+
+```
+EXT:my_sitepackage/Resources/Private/Templates/Email/Notifications.html
+```
+
 ### Remove items
 If you wish to remove unread items, which are older than a certain time, you
 can use the following scheduler task:
