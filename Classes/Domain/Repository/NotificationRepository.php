@@ -142,7 +142,14 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
-     * Get number of notifications for user
+     * Get number of notifications for user.
+     *
+     * Results are cached in the RuntimeCache for the duration of the request so that multiple
+     * placements of lib.mdNotificationsCount on the same page (e.g. header badge + list page)
+     * do not trigger redundant COUNT queries. The cache key includes the feuser UID and the
+     * recordKeys filter so that different scopes are cached independently.
+     * deleteEntry() does not invalidate this cache because deleteAction() is always a separate
+     * AJAX request and can therefore never collide with a countItems() call in the same request.
      *
      * @param int $feuserUid Frontend user Uid
      * @param string|null $recordKeys Comma separated string of table names, eg. `pages, tx_news_domain_model_news`
@@ -151,6 +158,13 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function countItems(int $feuserUid, string $recordKeys = null): int
     {
+        $cacheKey = 'md_notifications_count_' . $feuserUid . '_' . md5($recordKeys ?? '');
+        $cached = $this->runtimeCache->get($cacheKey);
+
+        if ($cached !== false) {
+            return $cached;
+        }
+
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable(static::TABLE_NAME);
 
@@ -180,7 +194,10 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             }
         }
 
-        return $queryBuilder->executeQuery()->fetchOne();
+        $count = $queryBuilder->executeQuery()->fetchOne();
+        $this->runtimeCache->set($cacheKey, $count);
+
+        return $count;
     }
 
     /**
