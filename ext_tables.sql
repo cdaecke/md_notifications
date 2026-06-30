@@ -5,5 +5,5 @@ CREATE TABLE tx_mdnotifications_domain_model_notification (
 	feuser int(11) NOT NULL DEFAULT '0',
 	data text NOT NULL DEFAULT '',
 
-	KEY identifier (record_key,record_id)
+	KEY feuser_recordkey (feuser,record_key,record_id)
 );

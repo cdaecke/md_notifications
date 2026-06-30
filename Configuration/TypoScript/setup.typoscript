@@ -40,7 +40,7 @@ plugin.tx_mdnotifications_notifications {
  * <f:cObject typoscriptObjectPath="lib.mdNotificationsCount" data="{recordKeys:'pages,tx_news_domain_model_news'}" />
  *
  */
-lib.mdNotificationsCount = USER
+lib.mdNotificationsCount = USER_INT
 lib.mdNotificationsCount {
   userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
   extensionName = MdNotifications
@@ -63,7 +63,7 @@ lib.mdNotificationsCount {
  * <f:cObject typoscriptObjectPath="lib.mdNotificationsHasSeen" data="{recordKey:'tx_news_domain_model_news', recordUid:'{newsItem.uid}'}" />
  *
  */
-lib.mdNotificationsHasSeen = USER
+lib.mdNotificationsHasSeen = USER_INT
 lib.mdNotificationsHasSeen {
   userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
   extensionName = MdNotifications
@@ -89,7 +89,7 @@ lib.mdNotificationsHasSeen {
  * <f:cObject typoscriptObjectPath="lib.mdNotificationsRemove" data="{recordKey:'tx_news_domain_model_news', recordUid:'{newsItem.uid}'}" />
  *
  */
-lib.mdNotificationsRemove = USER
+lib.mdNotificationsRemove = USER_INT
 lib.mdNotificationsRemove {
   userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
   extensionName = MdNotifications

@@ -16,6 +16,8 @@ namespace Mediadreams\MdNotifications\Domain\Repository;
  */
 
 use Doctrine\DBAL\ArrayParameterType;
+use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
@@ -27,10 +29,18 @@ use TYPO3\CMS\Extbase\Persistence\QueryInterface;
  */
 class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
 {
-    /**
-     * The name of the notification table in the database
-     */
     const TABLE_NAME = 'tx_mdnotifications_domain_model_notification';
+
+    /**
+     * Request-scoped cache to avoid repeated DB queries for hasSeen() within the same request.
+     * Keyed by feuser UID and record_key, holds all record_ids the user has a notification for.
+     */
+    private FrontendInterface $runtimeCache;
+
+    public function injectCacheManager(CacheManager $cacheManager): void
+    {
+        $this->runtimeCache = $cacheManager->getCache('runtime');
+    }
 
     /**
      * Set default ordering for repository
@@ -76,20 +86,46 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
-     * Indicates whether the user has seen the given item
+     * Indicates whether the user has a notification for the given record.
+     *
+     * On the first call for a feuser+recordKey combination, all matching record_ids are loaded
+     * in a single query and stored in the RuntimeCache. Subsequent calls within the same request
+     * return immediately from the cache, reducing N DB queries (e.g. one per news list item)
+     * to a single query per record type per request.
      *
      * @param string $recordKey The record key (table name)
      * @param int $recordUid Uid of the record
      * @param int $feuserUid Frontend user Uid
-     * @return int
+     * @return int 1 if a notification exists, 0 otherwise
      */
     public function hasSeen(string $recordKey, int $recordUid, int $feuserUid): int
+    {
+        $cacheKey = 'md_notifications_' . $feuserUid . '_' . md5($recordKey);
+        $seenIds = $this->runtimeCache->get($cacheKey);
+
+        if ($seenIds === false) {
+            $seenIds = $this->loadSeenRecordIds($recordKey, $feuserUid);
+            $this->runtimeCache->set($cacheKey, $seenIds);
+        }
+
+        return in_array($recordUid, $seenIds) ? 1 : 0;
+    }
+
+    /**
+     * Loads all record_ids for which the given user has a notification of the given record type.
+     * TYPO3's DefaultRestrictionContainer is applied automatically (deleted, hidden, starttime, endtime).
+     *
+     * @param string $recordKey The record key (table name)
+     * @param int $feuserUid Frontend user Uid
+     * @return array<int> Flat array of record_ids
+     */
+    private function loadSeenRecordIds(string $recordKey, int $feuserUid): array
     {
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable(static::TABLE_NAME);
 
-        $queryBuilder = $queryBuilder
-            ->count('uid')
+        return $queryBuilder
+            ->select('record_id')
             ->from(static::TABLE_NAME)
             ->where(
                 $queryBuilder->expr()->eq(
@@ -97,16 +133,12 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
                     $queryBuilder->createNamedParameter($recordKey, Connection::PARAM_STR)
                 ),
                 $queryBuilder->expr()->eq(
-                    'record_id',
-                    $queryBuilder->createNamedParameter($recordUid, Connection::PARAM_INT)
-                ),
-                $queryBuilder->expr()->eq(
                     'feuser',
                     $queryBuilder->createNamedParameter($feuserUid, Connection::PARAM_INT)
                 )
-            );
-
-        return $queryBuilder->executeQuery()->fetchOne();
+            )
+            ->executeQuery()
+            ->fetchFirstColumn();
     }
 
     /**
@@ -152,7 +184,9 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
     }
 
     /**
-     * Delete entry for given record and user
+     * Delete entry for given record and user and invalidate the RuntimeCache for that
+     * feuser+recordKey combination so that a subsequent hasSeen() call in the same request
+     * reflects the deletion instead of returning stale cached data.
      *
      * @param string $recordKey The record key (table name)
      * @param int $recordUid Uid of the record
@@ -161,16 +195,17 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      */
     public function deleteEntry(string $recordKey, int $recordUid, int $feuserUid): void
     {
-        $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
+        $connection = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getConnectionForTable(static::TABLE_NAME);
 
-        $arrayWhere = [
+        $connection->delete(static::TABLE_NAME, [
             'record_key' => $recordKey,
             'record_id' => $recordUid,
             'feuser' => $feuserUid,
-        ];
+        ]);
 
-        $queryBuilder->delete(static::TABLE_NAME, $arrayWhere);
+        $cacheKey = 'md_notifications_' . $feuserUid . '_' . md5($recordKey);
+        $this->runtimeCache->remove($cacheKey);
     }
 
     /**
