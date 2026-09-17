@@ -105,6 +105,9 @@ class Notification extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
         $this->data = $data;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDataArr(): array
     {
         return json_decode($this->data, true);
