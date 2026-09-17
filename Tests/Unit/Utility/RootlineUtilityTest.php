@@ -41,8 +41,12 @@ final class RootlineUtilityTest extends TestCase
             ->getMock();
         $subject->expects($this->once())
             ->method('getRootlineIds')
-            ->with(42)
-            ->willReturn($rootlineIds);
+            ->willReturnCallback(static function (int $storageId) use ($rootlineIds): array {
+                self::assertSame(1, func_num_args());
+                self::assertSame(42, $storageId);
+
+                return $rootlineIds;
+            });
 
         self::assertSame($expected, $subject->isInRootline(42, $candidateIds));
     }
