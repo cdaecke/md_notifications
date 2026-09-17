@@ -1,5 +1,10 @@
 <?php
-return [
+
+declare(strict_types=1);
+
+use TYPO3\CMS\Core\Information\Typo3Version;
+
+$tca = [
     'ctrl' => [
         'title' => 'LLL:EXT:md_notifications/Resources/Private/Language/locallang_db.xlf:tx_mdnotifications_domain_model_notification',
         'label' => 'feuser',
@@ -17,7 +22,6 @@ return [
             'starttime' => 'starttime',
             'endtime' => 'endtime',
         ],
-        'searchFields' => 'record_key,data',
         'iconfile' => 'EXT:md_notifications/Resources/Public/Icons/user_plugin_notifications.svg',
         'security' => [
             'ignorePageTypeRestriction' => true,
@@ -62,8 +66,8 @@ return [
                 'items' => [
                     [
                         'label' => '',
-                        'invertStateDisplay' => true
-                    ]
+                        'invertStateDisplay' => true,
+                    ],
                 ],
             ],
         ],
@@ -75,8 +79,8 @@ return [
                 'format' => 'datetime',
                 'default' => 0,
                 'behaviour' => [
-                    'allowLanguageSynchronization' => true
-                ]
+                    'allowLanguageSynchronization' => true,
+                ],
             ],
         ],
         'endtime' => [
@@ -87,11 +91,11 @@ return [
                 'format' => 'datetime',
                 'default' => 0,
                 'range' => [
-                    'upper' => mktime(0, 0, 0, 1, 1, 2038)
+                    'upper' => mktime(0, 0, 0, 1, 1, 2038),
                 ],
                 'behaviour' => [
-                    'allowLanguageSynchronization' => true
-                ]
+                    'allowLanguageSynchronization' => true,
+                ],
             ],
         ],
 
@@ -104,7 +108,7 @@ return [
                 'size' => 30,
                 'eval' => 'trim',
                 'required' => true,
-                'default' => ''
+                'default' => '',
             ],
         ],
         'record_id' => [
@@ -115,7 +119,7 @@ return [
                 'type' => 'number',
                 'size' => 30,
                 'required' => true,
-            ]
+            ],
         ],
         'feuser' => [
             'exclude' => false,
@@ -136,7 +140,7 @@ return [
                         'searchWholePhrase' => 1,
                     ],
                 ],
-            ]
+            ],
         ],
         'record_date' => [
             'exclude' => false,
@@ -146,7 +150,7 @@ return [
                 'type' => 'datetime',
                 'format' => 'datetime',
                 'size' => 20,
-                'default' => time()
+                'default' => time(),
             ],
         ],
         'data' => [
@@ -157,9 +161,21 @@ return [
                 'type' => 'text',
                 'rows' => 10,
                 'eval' => 'trim',
-                'default' => ''
-            ]
+                'default' => '',
+            ],
         ],
 
     ],
 ];
+
+if ((new Typo3Version())->getMajorVersion() < 14) {
+    $tca['ctrl']['searchFields'] = 'record_key,data';
+
+    return $tca;
+}
+
+foreach (['starttime', 'endtime', 'record_date'] as $fieldName) {
+    $tca['columns'][$fieldName]['config']['searchable'] = false;
+}
+
+return $tca;
