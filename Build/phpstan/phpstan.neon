@@ -1,0 +1,15 @@
+parameters:
+  level: 8
+
+  paths:
+    - ../../Classes
+    - ../../Tests
+
+  excludePaths:
+    analyse:
+      - ../../.Build
+      - ../../var
+
+  tmpDir: ../../.Build/phpstan
+  treatPhpDocTypesAsCertain: false
+  reportUnmatchedIgnoredErrors: false
