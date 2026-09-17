@@ -39,7 +39,7 @@ class MailService
      * @return bool
      * @throws TransportExceptionInterface
      */
-    public static function sendMail(string $to, string $subject, array $data, string $template, Request $request = null): bool
+    public static function sendMail(string $to, string $subject, array $data, string $template, ?Request $request = null): bool
     {
         $email = new FluidEmail();
         $email

@@ -156,7 +156,7 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @return int
      * @throws \Doctrine\DBAL\Exception
      */
-    public function countItems(int $feuserUid, string $recordKeys = null): int
+    public function countItems(int $feuserUid, ?string $recordKeys = null): int
     {
         $cacheKey = 'md_notifications_count_' . $feuserUid . '_' . md5($recordKeys ?? '');
         $cached = $this->runtimeCache->get($cacheKey);
