@@ -6,7 +6,8 @@ record type or for all record types together.
 
 ## Requirements
 
-- TYPO3 v12.4 || v13.4
+- PHP 8.2, 8.3, 8.4 or 8.5
+- TYPO3 v13.4+ or v14.3+
 
 ## Screenshots
 
