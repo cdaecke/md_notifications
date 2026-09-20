@@ -39,7 +39,7 @@ class TCEmainHook
      * @param string $action The performed action
      * @param string $table The table name of the record
      * @param string $recordUid Temporary id of the record, eg `NEW67b5f96849921638839656`
-     * @param array $fieldArray The data array, which holds all information on the record
+     * @param array<string, mixed> $fieldArray The data array, which holds all information on the record
      * @param DataHandler $pObj Parent Object
      * @throws \TYPO3\CMS\Core\Exception|\Doctrine\DBAL\Exception
      */
@@ -49,22 +49,21 @@ class TCEmainHook
         string $recordUid,
         array $fieldArray,
         DataHandler &$pObj
-    ): void
-    {
-        if ($action == 'new') {
+    ): void {
+        if ($action === 'new') {
             $siteConfig = $this->getSiteConfig($fieldArray['pid']);
             if ($this->inCharge($siteConfig, $fieldArray['pid'], $table)) {
                 // get uid of new record
                 $recordId = $pObj->substNEWwithIDs[$recordUid];
 
-                if (!$recordId) {
+                if ($recordId <= 0) {
                     $this->enqueueFlashmessage('Notification for record could not be saved!');
                     return;
                 }
 
                 $this->saveNotificationInfo($recordId, $table, $fieldArray, $siteConfig);
             }
-        } else if ($action == 'update') {
+        } elseif ($action === 'update') {
             // TODO: Check, if there is another way, to get the `pid` of the record
             $pid = (int)$pObj->checkValue_currentRecord['pid'];
             $siteConfig = $this->getSiteConfig($pid);
@@ -79,10 +78,9 @@ class TCEmainHook
      *
      * @param string $table Table name of record
      * @param int $id Id of record
-     * @param array $recordToDelete Array of all data of record
+     * @param array<string, mixed> $recordToDelete Array of all data of record
      * @param bool $recordWasDeleted
      * @param DataHandler $pObj Parent Object
-     * @return void
      * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
      */
     public function processCmdmap_deleteAction(
@@ -91,8 +89,7 @@ class TCEmainHook
         array $recordToDelete,
         bool $recordWasDeleted,
         DataHandler &$pObj
-    ): void
-    {
+    ): void {
         $siteConfig = $this->getSiteConfig($recordToDelete['pid']);
         if ($this->inCharge($siteConfig, $recordToDelete['pid'], $table)) {
             $databaseConnection = GeneralUtility::makeInstance(ConnectionPool::class)
@@ -110,9 +107,8 @@ class TCEmainHook
      *
      * @param int $recordUid Uid of record
      * @param string $recordKey The key of the record (database table name)
-     * @param array $fieldArray Data of news entry
-     * @param array $siteConfig Site configuration
-     * @return void
+     * @param array<string, mixed> $fieldArray Data of news entry
+     * @param array<string, mixed> $siteConfig Site configuration
      * @throws \Doctrine\DBAL\Exception
      */
     protected function saveNotificationInfo(
@@ -120,8 +116,7 @@ class TCEmainHook
         string $recordKey,
         array $fieldArray,
         array $siteConfig = []
-    ): void
-    {
+    ): void {
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
 
         // find users
@@ -131,11 +126,12 @@ class TCEmainHook
             ->from('fe_users');
 
         // if $feGroup is set, just find users with given group
-        if (!empty($siteConfig['md_notifications']['feGroup']) && is_int($siteConfig['md_notifications']['feGroup'])) {
+        $frontendGroup = $siteConfig['md_notifications']['feGroup'] ?? null;
+        if (is_int($frontendGroup) && $frontendGroup > 0) {
             $feuserData = $feuserData->where(
                 $queryBuilderFeusers->expr()->inSet(
                     'usergroup',
-                    $queryBuilderFeusers->createNamedParameter($siteConfig['md_notifications']['feGroup'], Connection::PARAM_INT)
+                    $queryBuilderFeusers->createNamedParameter($frontendGroup, Connection::PARAM_INT)
                 )
             );
         }
@@ -149,6 +145,7 @@ class TCEmainHook
         if (count($feuserData) > 0) {
             // prepare data to save
             $timestamp = time();
+            $dataArray = [];
             foreach ($feuserData as $data) {
                 $dataArray[] = [
                     'pid'           => $siteConfig['md_notifications']['storagePid'] ?? 0,
@@ -181,10 +178,9 @@ class TCEmainHook
      *
      * @param string $recordId Id of record
      * @param string $recordKey Key of record (table name)
-     * @param array $fieldArray Modified data of the record
-     * @return void
+     * @param array<string, mixed> $fieldArray Modified data of the record
      */
-    protected function updateNotificationInfo(string $recordId, string $recordKey, array $fieldArray)
+    protected function updateNotificationInfo(string $recordId, string $recordKey, array $fieldArray): void
     {
         // Get record data in order to update it
         $connectionPool = GeneralUtility::makeInstance(ConnectionPool::class);
@@ -241,13 +237,13 @@ class TCEmainHook
      * Get site configuration
      *
      * @param int $storageId
-     * @return array
+     * @return array<string, mixed>
      * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
      */
     protected function getSiteConfig(int $storageId): array
     {
         if ($storageId > 0) {
-            $siteFinder = GeneralUtility::makeInstance(SiteFinder:: class);
+            $siteFinder = GeneralUtility::makeInstance(SiteFinder::class);
             $site = $siteFinder->getSiteByPageId($storageId);
             return $site->getConfiguration();
         }
@@ -258,7 +254,7 @@ class TCEmainHook
     /**
      * Check, if given record should be respected
      *
-     * @param array $siteConfig Array with settings from site configuration
+     * @param array<string, mixed> $siteConfig Array with settings from site configuration
      * @param int $storageId Storage Id of record
      * @param string $recordKey Record key (table name)
      * @return bool

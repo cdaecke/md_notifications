@@ -33,7 +33,7 @@ class MailService
      *
      * @param string $to
      * @param string $subject
-     * @param array $data
+     * @param array<string, mixed> $data
      * @param string $template
      * @param Request|null $request
      * @return bool
@@ -49,7 +49,7 @@ class MailService
             ->setTemplate($template)
             ->assignMultiple($data);
 
-        if ($request) {
+        if ($request !== null) {
             $email->setRequest($request);
         }
 

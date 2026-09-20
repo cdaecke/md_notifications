@@ -38,8 +38,9 @@ class NotificationController extends AbstractController
 
             $this->view->assignMultiple($this->getPaginatedItems($notifications));
 
-            if (!empty($this->settings['recordKeys'])) {
-                $this->view->assign('recordKeys', explode(',', $this->settings['recordKeys']));
+            $recordKeys = $this->settings['recordKeys'] ?? null;
+            if (is_string($recordKeys) && $recordKeys !== '') {
+                $this->view->assign('recordKeys', explode(',', $recordKeys));
             }
         }
 
@@ -63,8 +64,9 @@ class NotificationController extends AbstractController
 
             $this->view->assign('notifications', $notifications);
 
-            if (!empty($this->settings['recordKeys'])) {
-                $this->view->assign('recordKeys', explode(',', $this->settings['recordKeys']));
+            $recordKeys = $this->settings['recordKeys'] ?? null;
+            if (is_string($recordKeys) && $recordKeys !== '') {
+                $this->view->assign('recordKeys', explode(',', $recordKeys));
             }
         }
 
@@ -96,14 +98,17 @@ class NotificationController extends AbstractController
      */
     public function deleteAction(): ResponseInterface
     {
+        $recordKey = $this->settings['recordKey'] ?? null;
+        $recordUid = (int)($this->settings['recordUid'] ?? 0);
         if (
-            !empty($this->settings['recordKey'])
-            && (int)$this->settings['recordUid'] > 0
+            is_string($recordKey)
+            && $recordKey !== ''
+            && $recordUid > 0
             && $this->feuserUid !== null
         ) {
             $this->notificationRepository->deleteEntry(
-                $this->settings['recordKey'],
-                (int)$this->settings['recordUid'],
+                $recordKey,
+                $recordUid,
                 $this->feuserUid
             );
         }
