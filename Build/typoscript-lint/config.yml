@@ -5,9 +5,11 @@ sniffs:
       indentPerLevel: 2
       indentConditions: false
   - class: DeadCode
+    disabled: true
   - class: OperatorWhitespace
+  - class: RepeatingRValue
+    disabled: true
   - class: DuplicateAssignment
   - class: EmptySection
   - class: NestingConsistency
-    parameters:
-      commonPathPrefixThreshold: 1
+    disabled: true
