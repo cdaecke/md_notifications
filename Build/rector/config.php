@@ -9,6 +9,7 @@ use Rector\TypeDeclaration\Rector\ClassMethod\AddVoidReturnTypeWhereNoReturnRect
 use Rector\TypeDeclaration\Rector\StmtsAwareInterface\SafeDeclareStrictTypesRector;
 use Rector\ValueObject\PhpVersion;
 use Ssch\TYPO3Rector\CodeQuality\General\ExtEmConfRector;
+use Ssch\TYPO3Rector\CodeQuality\General\GeneralUtilityMakeInstanceToConstructorPropertyRector;
 use Ssch\TYPO3Rector\Configuration\Typo3Option;
 use Ssch\TYPO3Rector\Set\Typo3LevelSetList;
 use Ssch\TYPO3Rector\Set\Typo3SetList;
@@ -21,7 +22,6 @@ return RectorConfig::configure()
         $rootPath . '/Configuration',
         $rootPath . '/Tests',
         $rootPath . '/ext_localconf.php',
-        $rootPath . '/ext_tables.php',
     ])
     ->withPhpVersion(PhpVersion::PHP_82)
     ->withSets([
@@ -40,6 +40,7 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         ExtEmConfRector::class,
+        GeneralUtilityMakeInstanceToConstructorPropertyRector::class,
         SafeDeclareStrictTypesRector::class => [
             $rootPath . '/ext_emconf.php',
         ],

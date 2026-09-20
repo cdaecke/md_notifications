@@ -14,7 +14,6 @@ namespace Mediadreams\MdNotifications\Command;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
 use Mediadreams\MdNotifications\Domain\Repository\NotificationRepository;
 use Mediadreams\MdNotifications\Service\MailService;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -22,6 +21,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
@@ -94,7 +94,7 @@ class ReminderCommand extends Command
      *
      * @param int $listPageId The page id of the page which should be linked in the email
      * @return string
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     protected function getPageUri(int $listPageId): string
     {

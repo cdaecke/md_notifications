@@ -14,11 +14,12 @@ namespace Mediadreams\MdNotifications\Controller;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
+use Mediadreams\MdNotifications\Domain\Model\Notification;
 use Mediadreams\MdNotifications\Domain\Repository\NotificationRepository;
 use TYPO3\CMS\Core\Pagination\SlidingWindowPagination;
 use TYPO3\CMS\Core\TypoScript\TypoScriptService;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Pagination\QueryResultPaginator;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
 use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
@@ -26,7 +27,7 @@ use TYPO3\CMS\Frontend\ContentObject\ContentObjectRenderer;
 /**
  * Class AbstractController
  */
-abstract class AbstractController extends \TYPO3\CMS\Extbase\Mvc\Controller\ActionController
+abstract class AbstractController extends ActionController
 {
     /**
      * User Id of the logged in user
@@ -67,7 +68,7 @@ abstract class AbstractController extends \TYPO3\CMS\Extbase\Mvc\Controller\Acti
     /**
      * Get paginated items and paginator for query result
      *
-     * @param QueryResultInterface<int, \Mediadreams\MdNotifications\Domain\Model\Notification> $items
+     * @param QueryResultInterface<int, Notification> $items
      * @return array{
      *     notifications: iterable<mixed>,
      *     pagination: SlidingWindowPagination,

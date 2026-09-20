@@ -14,8 +14,8 @@ namespace Mediadreams\MdNotifications\Domain\Repository;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Exception;
 use Mediadreams\MdNotifications\Domain\Model\Notification;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -24,13 +24,14 @@ use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * The repository for Notifications
  *
- * @extends \TYPO3\CMS\Extbase\Persistence\Repository<Notification>
+ * @extends Repository<Notification>
  */
-class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class NotificationRepository extends Repository
 {
     public const TABLE_NAME = 'tx_mdnotifications_domain_model_notification';
 
@@ -159,7 +160,7 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param int $feuserUid Frontend user Uid
      * @param string|null $recordKeys Comma separated string of table names, eg. `pages, tx_news_domain_model_news`
      * @return int
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function countItems(int $feuserUid, ?string $recordKeys = null): int
     {
@@ -238,7 +239,7 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      *     user: array<string, mixed>,
      *     notification_records: list<array<string, mixed>>
      * }>
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
     public function getUsersWithNotifications(array $storageIds): array
     {

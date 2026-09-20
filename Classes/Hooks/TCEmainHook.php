@@ -14,12 +14,14 @@ namespace Mediadreams\MdNotifications\Hooks;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
 use Mediadreams\MdNotifications\Utility\RootlineUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
 use TYPO3\CMS\Core\DataHandling\DataHandler;
+use TYPO3\CMS\Core\Exception;
+use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
+use TYPO3\CMS\Core\Messaging\FlashMessageQueue;
 use TYPO3\CMS\Core\Messaging\FlashMessageService;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Type\ContextualFeedbackSeverity;
@@ -41,7 +43,7 @@ class TCEmainHook
      * @param string $recordUid Temporary id of the record, eg `NEW67b5f96849921638839656`
      * @param array<string, mixed> $fieldArray The data array, which holds all information on the record
      * @param DataHandler $pObj Parent Object
-     * @throws \TYPO3\CMS\Core\Exception|\Doctrine\DBAL\Exception
+     * @throws Exception|\Doctrine\DBAL\Exception
      */
     public function processDatamap_afterDatabaseOperations(
         string $action,
@@ -81,7 +83,7 @@ class TCEmainHook
      * @param array<string, mixed> $recordToDelete Array of all data of record
      * @param bool $recordWasDeleted
      * @param DataHandler $pObj Parent Object
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     public function processCmdmap_deleteAction(
         string $table,
@@ -238,7 +240,7 @@ class TCEmainHook
      *
      * @param int $storageId
      * @return array<string, mixed>
-     * @throws \TYPO3\CMS\Core\Exception\SiteNotFoundException
+     * @throws SiteNotFoundException
      */
     protected function getSiteConfig(int $storageId): array
     {
@@ -273,7 +275,7 @@ class TCEmainHook
      * Show flash message
      *
      * @param string $message
-     * @throws \TYPO3\CMS\Core\Exception
+     * @throws Exception
      */
     protected function enqueueFlashmessage(string $message): void
     {
@@ -288,7 +290,7 @@ class TCEmainHook
 
         /** @var FlashMessageService $flashMessageService */
         $flashMessageService = GeneralUtility::makeInstance(FlashMessageService::class);
-        /** @var \TYPO3\CMS\Core\Messaging\FlashMessageQueue $defaultFlashMessageQueue */
+        /** @var FlashMessageQueue $defaultFlashMessageQueue */
         $defaultFlashMessageQueue = $flashMessageService->getMessageQueueByIdentifier();
         $defaultFlashMessageQueue->enqueue($flashMessage);
     }
