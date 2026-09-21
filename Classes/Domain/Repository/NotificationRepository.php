@@ -39,7 +39,7 @@ class NotificationRepository extends Repository
      * Request-scoped cache to avoid repeated DB queries for hasSeen() within the same request.
      * Keyed by feuser UID and record_key, holds all record_ids the user has a notification for.
      */
-    private FrontendInterface $runtimeCache;
+    private readonly FrontendInterface $runtimeCache;
 
     /**
      * Set default ordering for repository
@@ -49,8 +49,9 @@ class NotificationRepository extends Repository
         'uid' => QueryInterface::ORDER_DESCENDING,
     ];
 
-    public function injectCacheManager(CacheManager $cacheManager): void
+    public function __construct(CacheManager $cacheManager)
     {
+        parent::__construct();
         $this->runtimeCache = $cacheManager->getCache('runtime');
     }
 
