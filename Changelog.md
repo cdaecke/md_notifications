@@ -1,3 +1,10 @@
+# Version 2.0.0 (2026-09-21)
+- [FEATURE] TYPO3 v14 support (support for TYPO3 v12 dropped)
+- [FEATURE] Site set support
+
+All changes
+https://github.com/cdaecke/md_notifications/compare/v1.0.4...v2.0.0
+
 # Version 1.0.4 (2025-09-12)
 - [TASK] double check for existence of field `starttime` and `endtime` in `TCEmainHook`
 
