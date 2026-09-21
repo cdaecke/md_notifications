@@ -133,7 +133,7 @@ class TCEmainHook
             $feuserData = $feuserData->where(
                 $queryBuilderFeusers->expr()->inSet(
                     'usergroup',
-                    $queryBuilderFeusers->createNamedParameter($frontendGroup, Connection::PARAM_INT)
+                    (string)$frontendGroup
                 )
             );
         }

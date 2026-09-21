@@ -1,0 +1,4 @@
+"fe_users"
+,"uid","pid","username","email","usergroup","disable","deleted"
+,1,10,"first-user","first@example.test","1",0,0
+,2,10,"second-user","second@example.test","2",0,0
