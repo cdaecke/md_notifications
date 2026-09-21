@@ -114,7 +114,7 @@
 			"phpunit --configuration=Build/phpunit/FunctionalTests.xml"
 		],
 		"check:tests:unit": "phpunit --configuration=Build/phpunit/UnitTests.xml",
-		"check:typoscript:lint": "typoscript-lint --config=Build/typoscript-lint/config.yml --ansi --no-interaction --fail-on-warnings Configuration/TypoScript Configuration/TSconfig Configuration/page.tsconfig",
+		"check:typoscript:lint": "typoscript-lint --config=Build/typoscript-lint/config.yml --ansi --no-interaction --fail-on-warnings Configuration/TypoScript Configuration/TSconfig Configuration/Sets/*/*.typoscript Configuration/page.tsconfig",
 		"check:xliff:lint": "php Build/Scripts/checkXliff.php",
 		"check:yaml:lint": "find . ! -path '*/.Build/*' ! -path '*/var/*' \\( -name '*.yaml' -o -name '*.yml' \\) -print0 | xargs -0 -r .Build/bin/yaml-lint",
 		"fix": [

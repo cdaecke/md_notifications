@@ -3,9 +3,20 @@
 declare(strict_types=1);
 
 $rootPath = dirname(__DIR__, 2);
-$files = glob($rootPath . '/Resources/Private/Language/*.xlf');
+$patterns = [
+    $rootPath . '/Resources/Private/Language/*.xlf',
+    $rootPath . '/Configuration/Sets/*/*.xlf',
+];
+$files = [];
+foreach ($patterns as $pattern) {
+    $matches = glob($pattern);
+    if ($matches !== false) {
+        array_push($files, ...$matches);
+    }
+}
+sort($files);
 
-if ($files === false || $files === []) {
+if ($files === []) {
     fwrite(STDERR, 'No XLIFF files found.' . PHP_EOL);
     exit(1);
 }

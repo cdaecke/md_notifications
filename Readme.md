@@ -15,12 +15,47 @@ record type or for all record types together.
 
 ## Installation
 - Install the extension by using composer (`composer req mediadreams/md-notifications`) or use the extension manager
-- Include the static TypoScript of the extension
+- Activate the site set `mediadreams/md-notifications` as described below. Alternatively, include the static TypoScript of the extension for legacy installations.
 - Configure the extension (see chapter [Configuration](#configuration))
 
 ## Configuration
+
+### Site set
+
+The extension provides the site set `mediadreams/md-notifications`. Activate it
+in the site configuration using the backend module `Site Management > Sites`, or
+add it to `config/sites/{site-identifier}/config.yaml`:
+
+```yaml
+dependencies:
+  - mediadreams/md-notifications
+```
+
+The site set loads the extension's TypoScript and provides the following site
+settings for overriding the Fluid template paths:
+
+| Site setting | Default |
+| --- | --- |
+| `md_notifications.view.templateRootPath` | `EXT:md_notifications/Resources/Private/Templates/` |
+| `md_notifications.view.partialRootPath` | `EXT:md_notifications/Resources/Private/Partials/` |
+| `md_notifications.view.layoutRootPath` | `EXT:md_notifications/Resources/Private/Layouts/` |
+
+These values can be changed in the site settings editor or in
+`config/sites/{site-identifier}/settings.yaml`, for example:
+
+```yaml
+md_notifications.view.templateRootPath: 'EXT:my_sitepackage/Resources/Private/Extensions/MdNotifications/Templates/'
+md_notifications.view.partialRootPath: 'EXT:my_sitepackage/Resources/Private/Extensions/MdNotifications/Partials/'
+md_notifications.view.layoutRootPath: 'EXT:my_sitepackage/Resources/Private/Extensions/MdNotifications/Layouts/'
+```
+
+The legacy TypoScript constants remain supported when the extension is included
+through a static TypoScript template instead of the site set.
+
+### Notification configuration
+
 Configuration is done in the sites configuration file. Either add the configuration
-directly in `config/sites/{site-itentifier}/config.yaml`, or import a YAML file
+directly in `config/sites/{site-identifier}/config.yaml`, or import a YAML file
 in your site configuration by using this command:
 
 ```

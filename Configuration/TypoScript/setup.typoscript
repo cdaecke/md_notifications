@@ -1,11 +1,11 @@
 plugin.tx_mdnotifications_notifications {
   view {
     templateRootPaths.0 = EXT:md_notifications/Resources/Private/Templates/
-    templateRootPaths.1 = {$plugin.tx_mdnotifications_notifications.view.templateRootPath}
+    templateRootPaths.1 = {$plugin.tx_mdnotifications_notifications.view.templateRootPath ?? $md_notifications.view.templateRootPath}
     partialRootPaths.0 = EXT:md_notifications/Resources/Private/Partials/
-    partialRootPaths.1 = {$plugin.tx_mdnotifications_notifications.view.partialRootPath}
+    partialRootPaths.1 = {$plugin.tx_mdnotifications_notifications.view.partialRootPath ?? $md_notifications.view.partialRootPath}
     layoutRootPaths.0 = EXT:md_notifications/Resources/Private/Layouts/
-    layoutRootPaths.1 = {$plugin.tx_mdnotifications_notifications.view.layoutRootPath}
+    layoutRootPaths.1 = {$plugin.tx_mdnotifications_notifications.view.layoutRootPath ?? $md_notifications.view.layoutRootPath}
   }
 
   persistence {
