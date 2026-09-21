@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mediadreams\MdNotifications\Domain\Model;
 
+use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
+
 /**
  * This file is part of the "Notifications" Extension for TYPO3 CMS.
  *
@@ -14,11 +16,10 @@ namespace Mediadreams\MdNotifications\Domain\Model;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
 /**
  * Notification
  */
-class Notification extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
+class Notification extends AbstractEntity
 {
     /**
      * The key of the data record.
@@ -105,6 +106,9 @@ class Notification extends \TYPO3\CMS\Extbase\DomainObject\AbstractEntity
         $this->data = $data;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getDataArr(): array
     {
         return json_decode($this->data, true);

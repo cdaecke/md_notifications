@@ -7,11 +7,11 @@ use Mediadreams\MdNotifications\Hooks\TCEmainHook;
 use TYPO3\CMS\Extbase\Utility\ExtensionUtility;
 use TYPO3\CMS\Scheduler\Task\TableGarbageCollectionTask;
 
-(static function() {
+(static function () {
     $plugins = [
         'Count',
         'HasSeen',
-        'Delete'
+        'Delete',
     ];
 
     foreach ($plugins as $plugin) {
@@ -19,10 +19,10 @@ use TYPO3\CMS\Scheduler\Task\TableGarbageCollectionTask;
             'MdNotifications',
             $plugin,
             [
-                NotificationController::class => lcfirst($plugin)
+                NotificationController::class => lcfirst($plugin),
             ],
             [
-                NotificationController::class => lcfirst($plugin)
+                NotificationController::class => lcfirst($plugin),
             ],
             ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
         );
@@ -32,17 +32,13 @@ use TYPO3\CMS\Scheduler\Task\TableGarbageCollectionTask;
         'MdNotifications',
         'Notifications',
         [
-            NotificationController::class => 'list'
+            NotificationController::class => 'list',
         ],
         [
-            NotificationController::class => 'list'
+            NotificationController::class => 'list',
         ],
         ExtensionUtility::PLUGIN_TYPE_CONTENT_ELEMENT
     );
-
-    \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPageTSConfig('
-        @import \'EXT:md_notifications/Configuration/TSconfig/ContentElementWizard.tsconfig\'
-    ');
 
     // Add path for email template
     $GLOBALS['TYPO3_CONF_VARS']['MAIL']['templateRootPaths'][2025] = 'EXT:md_notifications/Resources/Private/Templates/Email';

@@ -14,8 +14,8 @@ namespace Mediadreams\MdNotifications\Service;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use TYPO3\CMS\Core\Log\LogLevel;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Mail\FluidEmail;
 use TYPO3\CMS\Core\Mail\MailerInterface;
@@ -33,13 +33,13 @@ class MailService
      *
      * @param string $to
      * @param string $subject
-     * @param array $data
+     * @param array<string, mixed> $data
      * @param string $template
      * @param Request|null $request
      * @return bool
      * @throws TransportExceptionInterface
      */
-    public static function sendMail(string $to, string $subject, array $data, string $template, Request $request = null): bool
+    public static function sendMail(string $to, string $subject, array $data, string $template, ?Request $request = null): bool
     {
         $email = new FluidEmail();
         $email
@@ -49,7 +49,7 @@ class MailService
             ->setTemplate($template)
             ->assignMultiple($data);
 
-        if ($request) {
+        if ($request instanceof Request) {
             $email->setRequest($request);
         }
 
@@ -60,10 +60,10 @@ class MailService
             return true;
         } catch (\Exception $e) {
             $logger = GeneralUtility::makeInstance(LogManager::class)
-                ->getLogger(__CLASS__);
+                ->getLogger(self::class);
 
             $logger->log(
-                \TYPO3\CMS\Core\Log\LogLevel::ERROR,
+                LogLevel::ERROR,
                 'sendMail failed!',
                 [
                     'Exception' => $e->getMessage(),

@@ -1,34 +1,138 @@
 {
-    "name": "mediadreams/md-notifications",
-    "type": "typo3-cms-extension",
-    "description": "Notify frontend users about the creation of new data records. Every data type can be configured easily, for example pages (blog posts) or tx_news records.",
+	"name": "mediadreams/md-notifications",
+	"description": "Notify frontend users about the creation of new data records. Every data type can be configured easily, for example pages (blog posts) or tx_news records.",
 	"license": "GPL-2.0-or-later",
+	"type": "typo3-cms-extension",
 	"keywords": [
 		"typo3",
 		"extension",
 		"notifications"
 	],
-    "authors": [
-        {
-            "name": "Christoph Daecke",
-            "role": "Developer"
-        }
-    ],
+	"authors": [
+		{
+			"name": "Christoph Daecke",
+			"role": "Developer"
+		}
+	],
 	"support": {
 		"issues": "https://github.com/cdaecke/md_notifications/issues",
 		"source": "https://github.com/cdaecke/md_notifications"
 	},
-    "require": {
-		"typo3/cms-core": "^12.4 || ^13.4"
+	"require": {
+		"php": "~8.2.0 || ~8.3.0 || ~8.4.0 || ~8.5.0",
+		"doctrine/dbal": "^4.4.3",
+		"psr/http-message": "^1.1 || ^2.0",
+		"symfony/console": "^7.4",
+		"typo3/cms-core": "^13.4 || ^14.3",
+		"typo3/cms-extbase": "^13.4 || ^14.3",
+		"typo3/cms-fluid": "^13.4 || ^14.3",
+		"typo3/cms-frontend": "^13.4 || ^14.3",
+		"typo3/cms-scheduler": "^13.4 || ^14.3"
 	},
-    "autoload": {
-        "psr-4": {
-            "Mediadreams\\MdNotifications\\": "Classes"
-        }
-    },
-    "extra": {
-        "typo3/cms": {
-            "extension-key": "md_notifications"
-        }
-    }
+	"require-dev": {
+		"a9f/typo3-fractor": "^1.0",
+		"ergebnis/composer-normalize": "^2.52",
+		"friendsofphp/php-cs-fixer": "^3.95",
+		"helmich/typo3-typoscript-lint": "^3.3",
+		"php-parallel-lint/php-parallel-lint": "^1.4",
+		"phpstan/extension-installer": "^1.4",
+		"phpstan/phpstan": "^2.2",
+		"phpstan/phpstan-deprecation-rules": "^2.0",
+		"phpstan/phpstan-phpunit": "^2.0",
+		"phpstan/phpstan-strict-rules": "^2.0",
+		"phpunit/phpunit": "^11.5",
+		"saschaegerer/phpstan-typo3": "^2.2 || ^3.1",
+		"seld/jsonlint": "^1.12",
+		"ssch/typo3-rector": "^3.14",
+		"symfony/yaml": "^7.4",
+		"typo3/coding-standards": "^0.9",
+		"typo3/testing-framework": "^9.6"
+	},
+	"autoload": {
+		"psr-4": {
+			"Mediadreams\\MdNotifications\\": "Classes/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Mediadreams\\MdNotifications\\Tests\\": "Tests/"
+		}
+	},
+	"config": {
+		"allow-plugins": {
+			"a9f/fractor-extension-installer": true,
+			"ergebnis/composer-normalize": true,
+			"phpstan/extension-installer": true,
+			"typo3/class-alias-loader": true,
+			"typo3/cms-composer-installers": true
+		},
+		"bin-dir": ".Build/bin",
+		"lock": false,
+		"preferred-install": {
+			"*": "dist"
+		},
+		"sort-packages": true,
+		"vendor-dir": ".Build/vendor"
+	},
+	"extra": {
+		"typo3/cms": {
+			"extension-key": "md_notifications",
+			"web-dir": ".Build/public"
+		}
+	},
+	"scripts": {
+		"check": [
+			"@check:static",
+			"@check:tests"
+		],
+		"check:composer:normalize": "@composer normalize --no-check-lock --dry-run",
+		"check:fractor": "fractor process --dry-run --config=Build/fractor/config.php",
+		"check:json:lint": "find . ! -path '*/.Build/*' ! -path '*/.git/*' ! -path '*/var/*' -name '*.json' -print0 | xargs -0 -r php .Build/bin/jsonlint -q",
+		"check:php:cs-fixer": "php-cs-fixer fix --config=Build/php-cs-fixer/config.php --dry-run --diff",
+		"check:php:lint": "parallel-lint --exclude .Build --exclude var *.php Build Classes Configuration Tests",
+		"check:php:rector": "rector process --dry-run --config=Build/rector/config.php",
+		"check:php:stan": "phpstan analyse --configuration=Build/phpstan/phpstan.neon --memory-limit=-1",
+		"check:static": [
+			"@check:composer:normalize",
+			"@check:json:lint",
+			"@check:php:lint",
+			"@check:php:cs-fixer",
+			"@check:php:rector",
+			"@check:php:stan",
+			"@check:fractor",
+			"@check:typoscript:lint",
+			"@check:xliff:lint",
+			"@check:yaml:lint"
+		],
+		"check:tests": [
+			"@check:tests:unit",
+			"@check:tests:functional"
+		],
+		"check:tests:create-directories": "mkdir -p .Build/public/typo3temp/var/tests .Build/public/typo3temp/var/transient",
+		"check:tests:functional": [
+			"@check:tests:create-directories",
+			"phpunit --configuration=Build/phpunit/FunctionalTests.xml"
+		],
+		"check:tests:unit": "phpunit --configuration=Build/phpunit/UnitTests.xml",
+		"check:typoscript:lint": "typoscript-lint --config=Build/typoscript-lint/config.yml --ansi --no-interaction --fail-on-warnings Configuration/TypoScript Configuration/TSconfig Configuration/Sets/*/*.typoscript Configuration/page.tsconfig",
+		"check:xliff:lint": "php Build/Scripts/checkXliff.php",
+		"check:yaml:lint": "find . ! -path '*/.Build/*' ! -path '*/var/*' \\( -name '*.yaml' -o -name '*.yml' \\) -print0 | xargs -0 -r .Build/bin/yaml-lint",
+		"fix": [
+			"@fix:composer:normalize",
+			"@fix:php"
+		],
+		"fix:composer:normalize": "@composer normalize --no-check-lock",
+		"fix:php": [
+			"@fix:php:rector",
+			"@fix:php:cs-fixer"
+		],
+		"fix:php:cs-fixer": "php-cs-fixer fix --config=Build/php-cs-fixer/config.php",
+		"fix:php:rector": "rector process --config=Build/rector/config.php"
+	},
+	"scripts-descriptions": {
+		"check": "Runs all static checks and automated tests.",
+		"check:static": "Runs all static code-quality checks.",
+		"check:tests": "Runs all automated tests.",
+		"fix": "Applies all automatic code-quality fixes."
+	}
 }

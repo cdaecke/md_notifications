@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <xliff version="1.0">
 	<file source-language="en" datatype="plaintext" original="EXT:md_notifications/Resources/Private/Language/locallang_db.xlf" date="2025-01-15T18:22:55Z" product-name="md_notifications">
 		<header/>
@@ -45,7 +45,6 @@
 			<trans-unit id="mdnotifications_notifications.description" resname="mdnotifications_notifications.description">
 				<source>Show list of notifications for a frontend user.</source>
 			</trans-unit>
-
 			<trans-unit id="settings.recordKeys" resname="settings.recordKeys">
 				<source>Record keys</source>
 			</trans-unit>

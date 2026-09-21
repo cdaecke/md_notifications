@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff
+	xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+	<file source-language="en" datatype="plaintext" original="EXT:md_notifications/Configuration/Sets/MdNotifications/labels.xlf" date="2026-09-21T00:00:00Z" product-name="md_notifications">
+		<header/>
+		<body>
+			<trans-unit id="label" resname="label">
+				<source>Notifications</source>
+			</trans-unit>
+			<trans-unit id="categories.md_notifications" resname="categories.md_notifications">
+				<source>Notifications</source>
+			</trans-unit>
+			<trans-unit id="categories.description.md_notifications" resname="categories.description.md_notifications">
+				<source>Settings for the Notifications extension</source>
+			</trans-unit>
+			<trans-unit id="categories.md_notifications.templates" resname="categories.md_notifications.templates">
+				<source>Templates</source>
+			</trans-unit>
+			<trans-unit id="categories.description.md_notifications.templates" resname="categories.description.md_notifications.templates">
+				<source>Paths for custom Fluid templates, partials and layouts</source>
+			</trans-unit>
+			<trans-unit id="settings.md_notifications.view.templateRootPath" resname="settings.md_notifications.view.templateRootPath">
+				<source>Template root path</source>
+			</trans-unit>
+			<trans-unit id="settings.description.md_notifications.view.templateRootPath" resname="settings.description.md_notifications.view.templateRootPath">
+				<source>Path to custom Fluid templates for the extension</source>
+			</trans-unit>
+			<trans-unit id="settings.md_notifications.view.partialRootPath" resname="settings.md_notifications.view.partialRootPath">
+				<source>Partial root path</source>
+			</trans-unit>
+			<trans-unit id="settings.description.md_notifications.view.partialRootPath" resname="settings.description.md_notifications.view.partialRootPath">
+				<source>Path to custom Fluid partials for the extension</source>
+			</trans-unit>
+			<trans-unit id="settings.md_notifications.view.layoutRootPath" resname="settings.md_notifications.view.layoutRootPath">
+				<source>Layout root path</source>
+			</trans-unit>
+			<trans-unit id="settings.description.md_notifications.view.layoutRootPath" resname="settings.description.md_notifications.view.layoutRootPath">
+				<source>Path to custom Fluid layouts for the extension</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

@@ -26,7 +26,7 @@ class RootlineUtility
      * Get array with UIDs of pages, which are in the rootline of the provided pageUid
      *
      * @param int $storageId The storage id of the record
-     * @return array
+     * @return list<int>
      */
     public function getRootlineIds(int $storageId): array
     {
@@ -45,11 +45,10 @@ class RootlineUtility
      * Check, if one of the provided recordIds is in rootline
      *
      * @param int $storageId The storage id of the record
-     * @param array $idArr An array of Ids, which can be in the rootline
-     * @return bool
+     * @param list<int> $idArr An array of Ids, which can be in the rootline
      */
     public function isInRootline(int $storageId, array $idArr): bool
     {
-        return !empty(array_intersect($this->getRootlineIds($storageId, true), $idArr));
+        return array_intersect($this->getRootlineIds($storageId), $idArr) !== [];
     }
 }

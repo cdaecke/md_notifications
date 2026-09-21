@@ -14,33 +14,32 @@ namespace Mediadreams\MdNotifications\Domain\Repository;
  *
  * (c) 2025 Christoph Daecke <typo3@mediadreams.org>
  */
-
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Exception;
+use Mediadreams\MdNotifications\Domain\Model\Notification;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Database\Connection;
 use TYPO3\CMS\Core\Database\ConnectionPool;
-use TYPO3\CMS\Extbase\Persistence\Generic\QueryResult;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
+use TYPO3\CMS\Extbase\Persistence\QueryResultInterface;
+use TYPO3\CMS\Extbase\Persistence\Repository;
 
 /**
  * The repository for Notifications
+ *
+ * @extends Repository<Notification>
  */
-class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
+class NotificationRepository extends Repository
 {
-    const TABLE_NAME = 'tx_mdnotifications_domain_model_notification';
+    public const TABLE_NAME = 'tx_mdnotifications_domain_model_notification';
 
     /**
      * Request-scoped cache to avoid repeated DB queries for hasSeen() within the same request.
      * Keyed by feuser UID and record_key, holds all record_ids the user has a notification for.
      */
-    private FrontendInterface $runtimeCache;
-
-    public function injectCacheManager(CacheManager $cacheManager): void
-    {
-        $this->runtimeCache = $cacheManager->getCache('runtime');
-    }
+    private readonly FrontendInterface $runtimeCache;
 
     /**
      * Set default ordering for repository
@@ -50,20 +49,26 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         'uid' => QueryInterface::ORDER_DESCENDING,
     ];
 
+    public function __construct(CacheManager $cacheManager)
+    {
+        parent::__construct();
+        $this->runtimeCache = $cacheManager->getCache('runtime');
+    }
+
     /**
      * Get list of notification records for given user
      *
      *
      * @param int $feuserUid
      * @param string $recordKeys Comma separated string of table names, eg. `pages, tx_news_domain_model_news`
-     * @return QueryResult
+     * @return QueryResultInterface<int, Notification>
      */
-    public function getList(int $feuserUid, string $recordKeys = ''): QueryResult
+    public function getList(int $feuserUid, string $recordKeys = ''): QueryResultInterface
     {
         $query = $this->createQuery();
-        $constraints[] = $query->equals('feuser', $feuserUid);
+        $constraints = [$query->equals('feuser', $feuserUid)];
 
-        if (!empty($recordKeys)) {
+        if ($recordKeys !== '') {
             $types = GeneralUtility::trimExplode(',', $recordKeys);
 
             $orStatements = [];
@@ -108,7 +113,7 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             $this->runtimeCache->set($cacheKey, $seenIds);
         }
 
-        return in_array($recordUid, $seenIds) ? 1 : 0;
+        return in_array($recordUid, $seenIds, true) ? 1 : 0;
     }
 
     /**
@@ -124,7 +129,7 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
         $queryBuilder = GeneralUtility::makeInstance(ConnectionPool::class)
             ->getQueryBuilderForTable(static::TABLE_NAME);
 
-        return $queryBuilder
+        $recordIds = $queryBuilder
             ->select('record_id')
             ->from(static::TABLE_NAME)
             ->where(
@@ -139,6 +144,8 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             )
             ->executeQuery()
             ->fetchFirstColumn();
+
+        return array_map(static fn(mixed $recordId): int => (int)$recordId, $recordIds);
     }
 
     /**
@@ -154,9 +161,9 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param int $feuserUid Frontend user Uid
      * @param string|null $recordKeys Comma separated string of table names, eg. `pages, tx_news_domain_model_news`
      * @return int
-     * @throws \Doctrine\DBAL\Exception
+     * @throws Exception
      */
-    public function countItems(int $feuserUid, string $recordKeys = null): int
+    public function countItems(int $feuserUid, ?string $recordKeys = null): int
     {
         $cacheKey = 'md_notifications_count_' . $feuserUid . '_' . md5($recordKeys ?? '');
         $cached = $this->runtimeCache->get($cacheKey);
@@ -208,7 +215,6 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * @param string $recordKey The record key (table name)
      * @param int $recordUid Uid of the record
      * @param int $feuserUid Uid of feuser record
-     * @return void
      */
     public function deleteEntry(string $recordKey, int $recordUid, int $feuserUid): void
     {
@@ -229,9 +235,12 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
      * Get all users which have notifications in selected Storage Pids.
      * Number of notifications is added in field `notificationItems`
      *
-     * @param array $storageIds Comma separated list of storage Ids
-     * @return array
-     * @throws \Doctrine\DBAL\Exception
+     * @param list<int> $storageIds Storage IDs
+     * @return array<int|string, array{
+     *     user: array<string, mixed>,
+     *     notification_records: list<array<string, mixed>>
+     * }>
+     * @throws Exception
      */
     public function getUsersWithNotifications(array $storageIds): array
     {
@@ -239,12 +248,12 @@ class NotificationRepository extends \TYPO3\CMS\Extbase\Persistence\Repository
             ->getQueryBuilderForTable(static::TABLE_NAME);
 
         $queryBuilder = $queryBuilder->select(
-                'notifications.record_key',
-                'notifications.record_id',
-                'notifications.record_date',
-                'notifications.data',
-                'u.*'
-            )
+            'notifications.record_key',
+            'notifications.record_id',
+            'notifications.record_date',
+            'notifications.data',
+            'u.*'
+        )
             ->from(static::TABLE_NAME, 'notifications')
             ->leftJoin(
                 'notifications',

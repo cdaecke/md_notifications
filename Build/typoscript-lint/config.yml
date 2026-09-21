@@ -1,0 +1,15 @@
+sniffs:
+  - class: Indentation
+    parameters:
+      useSpaces: true
+      indentPerLevel: 2
+      indentConditions: false
+  - class: DeadCode
+    disabled: true
+  - class: OperatorWhitespace
+  - class: RepeatingRValue
+    disabled: true
+  - class: DuplicateAssignment
+  - class: EmptySection
+  - class: NestingConsistency
+    disabled: true

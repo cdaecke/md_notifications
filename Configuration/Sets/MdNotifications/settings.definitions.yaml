@@ -1,0 +1,17 @@
+categories:
+  md_notifications: ~
+  md_notifications.templates:
+    parent: md_notifications
+settings:
+  md_notifications.view.templateRootPath:
+    default: 'EXT:md_notifications/Resources/Private/Templates/'
+    type: string
+    category: md_notifications.templates
+  md_notifications.view.partialRootPath:
+    default: 'EXT:md_notifications/Resources/Private/Partials/'
+    type: string
+    category: md_notifications.templates
+  md_notifications.view.layoutRootPath:
+    default: 'EXT:md_notifications/Resources/Private/Layouts/'
+    type: string
+    category: md_notifications.templates

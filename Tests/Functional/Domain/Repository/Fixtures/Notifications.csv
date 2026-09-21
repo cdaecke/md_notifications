@@ -1,0 +1,7 @@
+"tx_mdnotifications_domain_model_notification"
+,"uid","pid","record_key","record_id","record_date","feuser","data","hidden","deleted"
+,1,10,"pages",100,1000,1,"{""title"":""First page""}",0,0
+,2,10,"pages",101,2000,1,"{""title"":""Second page""}",0,0
+,3,20,"tx_news_domain_model_news",200,3000,1,"{""title"":""News item""}",0,0
+,4,10,"pages",100,4000,2,"{""title"":""First page""}",0,0
+,5,10,"pages",102,5000,1,"{""title"":""Hidden page""}",1,0
